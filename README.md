@@ -43,37 +43,6 @@ flowchart LR
     API -->|rate limiting, TTL state| Cache
 ```
 
-## Data model
-
-```mermaid
-erDiagram
-    USERS ||--o{ HABITS : has
-    HABITS ||--o{ CHECKINS : has
-
-    USERS {
-        int id
-        string name
-        string email
-        datetime created_at
-    }
-
-    HABITS {
-        int id
-        int user_id
-        string name
-        datetime created_at
-        int current_streak
-        int longest_streak
-    }
-
-    CHECKINS {
-        int id
-        int habit_id
-        datetime checked_at
-        datetime created_at
-    }
-```
-
 ## Preparing for the interview
 
 Before the interview, please:
