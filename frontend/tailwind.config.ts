@@ -21,6 +21,15 @@ const config: Config = {
           500: "#c9a580",
           900: "#5a4632",
         },
+        // The done accent. Green means today is finished, orange means the run
+        // is still live. The two never appear on the same card.
+        sage: {
+          100: "#e2f0e0",
+          300: "#a6c3a2",
+          500: "#57a45f",
+          700: "#3a7742",
+          900: "#27562d",
+        },
       },
       fontFamily: {
         sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],

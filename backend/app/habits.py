@@ -123,6 +123,39 @@ def delete_habit(
     db.commit()
 
 
+@router.delete("/habits/{habit_id}/checkins", response_model=schemas.HabitOut)
+def delete_today_checkin(
+    habit_id: int,
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    """Removes today's check-in, so the card returns to the not-done state."""
+    habit = (
+        db.query(models.Habit)
+        .filter(models.Habit.id == habit_id, models.Habit.user_id == user_id)
+        .first()
+    )
+    if not habit:
+        raise HTTPException(status_code=404, detail="Habit not found")
+
+    if not check_rate_limit(user_id, action="uncheckin", max_attempts=60, window_seconds=60):
+        raise HTTPException(status_code=429, detail="Too many uncheck attempts, slow down")
+
+    today = date.today()
+    for checkin in list(habit.checkins):
+        if checkin.checked_at.date() == today:
+            db.delete(checkin)
+    db.commit()
+    db.refresh(habit)
+
+    # The streak drops, so recompute it from the check-ins that are left.
+    habit.current_streak = _recompute_streak_for_read(habit)
+    db.add(habit)
+    db.commit()
+    db.refresh(habit)
+    return habit
+
+
 @router.post("/habits/{habit_id}/checkins", response_model=schemas.HabitOut)
 def create_checkin(
     habit_id: int,

@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
+
 import WeekStrip from "./WeekStrip";
 import {
   checkedDays,
@@ -15,8 +17,48 @@ type Props = {
   checkingIn: boolean;
   animateDay: string | null;
   onCheckIn: (habitId: number) => void;
+  onUncheck: (habitId: number) => void;
   onRemove: (habitId: number) => void;
 };
+
+/** The flame beside the current streak. */
+function FlameIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        d="M12 2c.6 3.2-1.4 4.6-2.9 6.1C7.6 9.6 6.5 11 6.5 13.2 6.5 17 9.2 20 12 20s5.5-3 5.5-6.8c0-2.4-1-4-2.4-5.6-.3 1-1 1.7-1.8 2 .5-2.9-.3-5.6-1.3-7.6z"
+        fill="#f2652a"
+      />
+      <path
+        d="M12 20c-1.7 0-3-1.4-3-3.2 0-1.3.7-2.2 1.6-3 .2.6.6 1 1.1 1.2.2-1.2 0-2.3-.4-3.3 1.3 1 2.7 2.3 2.7 5.1 0 1.8-1.3 3.2-2 3.2z"
+        fill="#ffb066"
+      />
+    </svg>
+  );
+}
+
+/** The cup beside the best streak. */
+function TrophyIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        d="M7 4h10v2h3v3a4 4 0 0 1-4 4h-.4A5 5 0 0 1 13 15.9V18h3v2H8v-2h3v-2.1A5 5 0 0 1 8.4 13H8a4 4 0 0 1-4-4V6h3V4zm0 4H6v1a2 2 0 0 0 1 1.7V8zm10 0v2.7A2 2 0 0 0 18 9V8h-1z"
+        fill="currentColor"
+      />
+    </svg>
+  );
+}
+
+/** The three dots that open the remove action. */
+function DotsIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <circle cx="5" cy="12" r="1.8" fill="currentColor" />
+      <circle cx="12" cy="12" r="1.8" fill="currentColor" />
+      <circle cx="19" cy="12" r="1.8" fill="currentColor" />
+    </svg>
+  );
+}
 
 export default function HabitRow({
   habit,
@@ -24,6 +66,7 @@ export default function HabitRow({
   checkingIn,
   animateDay,
   onCheckIn,
+  onUncheck,
   onRemove,
 }: Props) {
   const days = currentWeek(today);
@@ -50,44 +93,129 @@ export default function HabitRow({
       ? ` ${ahead} ${ahead === 1 ? "day is" : "days are"} still to come.`
       : "");
 
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const dotsRef = useRef<HTMLButtonElement | null>(null);
+
+  // The menu closes on Escape, on a click away, and when the habit list moves
+  // this row out from under it.
+  useEffect(() => {
+    if (!menuOpen) return;
+
+    function onPointerDown(event: MouseEvent) {
+      const target = event.target as Node;
+      if (menuRef.current?.contains(target) || dotsRef.current?.contains(target)) {
+        return;
+      }
+      setMenuOpen(false);
+    }
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        dotsRef.current?.focus();
+      }
+    }
+
+    document.addEventListener("mousedown", onPointerDown);
+    document.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", onPointerDown);
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [menuOpen]);
+
   return (
     <li className="leaf">
       <div className="min-w-0">
-        <h2 className="truncate text-[0.9375rem] font-semibold leading-tight text-[var(--color-ink)]">
+        <h2 className="text-[0.875rem] font-semibold leading-snug text-[var(--color-ink)]">
           {habit.name}
         </h2>
-        <p className="mt-1 text-[0.6875rem] leading-tight text-[var(--color-ink-muted)]">
-          {habit.longest_streak > 0 ? `best ${habit.longest_streak}` : "no streak yet"}
-        </p>
       </div>
 
       <WeekStrip checked={checked} today={today} animateDay={animateDay} />
 
-      <p className="flex items-baseline justify-end gap-1.5 text-right">
-        <span className="text-[1.75rem] font-semibold leading-none tracking-tight tabular-nums text-[var(--color-ink)]">
-          {streak}
-        </span>
-        <span className="text-[0.6875rem] text-[var(--color-ink-muted)]">
-          {streak === 1 ? "day" : "days"}
-        </span>
-      </p>
+      <div className="figures">
+        <div className="figure">
+          <div className="figure-row">
+            <FlameIcon />
+            <span className="figure-num">{streak}</span>
+          </div>
+          <span className="figure-label">Current</span>
+        </div>
 
-      <div className="flex flex-col items-stretch gap-1.5">
+        <div className="figure-rule" aria-hidden="true" />
+
+        <div className="figure">
+          <div className="figure-row text-[var(--color-ink-muted)]">
+            <TrophyIcon />
+            <span className="figure-num">{habit.longest_streak}</span>
+          </div>
+          <span className="figure-label">Best</span>
+        </div>
+      </div>
+
+      <div>
+        {doneToday ? (
+          <button
+            type="button"
+            className="btn-done btn-check"
+            onClick={() => onUncheck(habit.id)}
+            disabled={checkingIn}
+            aria-label={`Undo today's check-in for ${habit.name}`}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M5 12.5 10 17.5 19 7"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.6"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+            Checked in
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="btn-primary btn-check"
+            disabled={checkingIn}
+            onClick={() => onCheckIn(habit.id)}
+          >
+            {checkingIn ? "Checking in" : "Check in"}
+          </button>
+        )}
+      </div>
+
+      <div className="menu" ref={menuRef}>
         <button
           type="button"
-          className="btn-primary"
-          disabled={doneToday || checkingIn}
-          onClick={() => onCheckIn(habit.id)}
+          ref={dotsRef}
+          className="btn-menu"
+          aria-expanded={menuOpen}
+          aria-haspopup="menu"
+          aria-label={`More actions for ${habit.name}`}
+          onClick={() => setMenuOpen((open) => !open)}
         >
-          {doneToday ? "Checked in" : checkingIn ? "Checking in" : "Check in"}
+          <DotsIcon />
         </button>
-        <button
-          type="button"
-          className="btn-quiet"
-          onClick={() => onRemove(habit.id)}
-        >
-          Remove
-        </button>
+
+        {menuOpen && (
+          <div className="menu-panel" role="menu">
+            <button
+              type="button"
+              role="menuitem"
+              className="menu-item menu-item-danger"
+              onClick={() => {
+                setMenuOpen(false);
+                onRemove(habit.id);
+              }}
+            >
+              Remove habit
+            </button>
+          </div>
+        )}
       </div>
 
       <p className="sr-only">{summary}</p>

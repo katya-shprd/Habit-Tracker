@@ -119,6 +119,39 @@ export default function DashboardPage() {
       });
   }
 
+  function handleUncheck(habitId: number) {
+    if (userId === null || checkingInId !== null || !today) return;
+    setCheckingInId(habitId);
+    setNotice(null);
+
+    fetch(`${API_URL}/habits/${habitId}/checkins`, {
+      method: "DELETE",
+      headers: { "X-User-Id": String(userId) },
+    })
+      .then((res) => {
+        if (res.status === 429) {
+          setNotice(
+            "Too many attempts in a minute. Wait a moment, then try again."
+          );
+          return null;
+        }
+        if (!res.ok) throw new Error(`Request failed with status ${res.status}`);
+        return res.json();
+      })
+      .then((updated: Habit | null) => {
+        if (updated) {
+          setHabits((prev) =>
+            prev.map((h) => (h.id === updated.id ? updated : h))
+          );
+        }
+        setCheckingInId(null);
+      })
+      .catch(() => {
+        setNotice("That undo did not go through. Try again.");
+        setCheckingInId(null);
+      });
+  }
+
   function handleAddHabit(event: FormEvent) {
     event.preventDefault();
     const name = newHabitName.trim();
@@ -171,7 +204,7 @@ export default function DashboardPage() {
 
   return (
     <main className="min-h-screen px-8 py-10">
-      <div className="mx-auto w-full max-w-[44rem]">
+      <div className="mx-auto w-full max-w-[58rem]">
         <header className="flex items-center justify-between gap-6 pb-6">
           <div className="flex items-center gap-3">
             <img src="/images/tiger-logo.png" alt="" className="h-9 w-9" />
@@ -217,18 +250,22 @@ export default function DashboardPage() {
             {[0, 1, 2].map((i) => (
               <li key={i} className="leaf animate-pulse">
                 <div className="min-w-0">
-                  <div className="h-4 w-32 rounded bg-[var(--color-rule)]" />
-                  <div className="mt-2 h-3 w-14 rounded bg-[var(--color-rule)]" />
+                  <div className="h-5 w-40 rounded bg-[var(--color-rule)]" />
                 </div>
-                <div className="w-[210px]">
+                <div className="w-[236px]">
                   <div className="h-[18px] w-full rounded bg-[var(--color-rule)]" />
-                  <div className="mt-2.5 h-[18px] w-full rounded-full bg-[var(--color-rule)]" />
+                  <div className="mt-2 h-[20px] w-full rounded-full bg-[var(--color-rule)]" />
+                  <div className="mt-1.5 h-4 w-full rounded bg-[var(--color-rule)]" />
                 </div>
-                <div className="h-6 w-12 rounded bg-[var(--color-rule)]" />
-                <div className="flex flex-col items-stretch gap-1.5">
-                  <div className="h-8 w-[104px] rounded-[var(--radius)] bg-[var(--color-rule)]" />
-                  <div className="h-3 w-full rounded bg-[var(--color-rule)]" />
+                <div className="flex items-center gap-5">
+                  <div className="h-8 w-12 rounded bg-[var(--color-rule)]" />
+                  <div className="h-8 w-px bg-[var(--color-rule)]" />
+                  <div className="h-8 w-12 rounded bg-[var(--color-rule)]" />
                 </div>
+                <div>
+                  <div className="h-11 w-[152px] rounded-[var(--radius)] bg-[var(--color-rule)]" />
+                </div>
+                <div className="h-9 w-9 rounded-full bg-[var(--color-rule)]" />
               </li>
             ))}
           </ul>
@@ -256,6 +293,7 @@ export default function DashboardPage() {
                 checkingIn={checkingInId === habit.id}
                 animateDay={workedDay[habit.id] ?? null}
                 onCheckIn={handleCheckIn}
+                onUncheck={handleUncheck}
                 onRemove={handleRemoveHabit}
               />
             ))}
