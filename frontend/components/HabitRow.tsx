@@ -75,8 +75,15 @@ export default function HabitRow({
   const todayKey = dayKey(today);
   const doneToday = checked.has(todayKey);
   const streak = habit.current_streak;
+  // A habit created partway through this week has no history before its first
+  // day, so those days are not misses.
+  const startsOn = dayKey(new Date(habit.created_at));
 
-  const past = days.filter((d) => d.key < todayKey);
+  // Only count days the habit was alive for. A day with a real check-in counts
+  // whatever the creation date says.
+  const past = days.filter(
+    (d) => d.key < todayKey && (d.key >= startsOn || checked.has(d.key))
+  );
   const worked = past.filter((d) => checked.has(d.key));
   const missed = past.filter((d) => !checked.has(d.key));
   const ahead = days.filter((d) => isFuture(d.key, todayKey)).length;
@@ -129,15 +136,20 @@ export default function HabitRow({
 
   return (
     <li className="leaf">
-      <div className="min-w-0">
+      <div className="min-w-0 zone-name">
         <h2 className="text-[0.875rem] font-semibold leading-snug text-[var(--color-ink)]">
           {habit.name}
         </h2>
       </div>
 
-      <WeekStrip checked={checked} today={today} animateDay={animateDay} />
+      <WeekStrip
+        checked={checked}
+        today={today}
+        startsOn={startsOn}
+        animateDay={animateDay}
+      />
 
-      <div className="figures">
+      <div className="figures zone-figures">
         <div className="figure">
           <div className="figure-row">
             <FlameIcon />
@@ -157,7 +169,7 @@ export default function HabitRow({
         </div>
       </div>
 
-      <div>
+      <div className="zone-action">
         {doneToday ? (
           <button
             type="button"
@@ -190,7 +202,7 @@ export default function HabitRow({
         )}
       </div>
 
-      <div className="menu" ref={menuRef}>
+      <div className="menu zone-menu" ref={menuRef}>
         <button
           type="button"
           ref={dotsRef}

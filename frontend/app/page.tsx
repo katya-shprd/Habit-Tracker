@@ -1,12 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { FormEvent } from "react";
 
 import HabitRow from "../components/HabitRow";
 import {
   dayKey,
-  formatLongDate,
   type Habit,
   type User,
 } from "../lib/habits";
@@ -197,24 +196,14 @@ export default function DashboardPage() {
       });
   }
 
-  const dateLine = useMemo(
-    () => (today ? formatLongDate(today) : ""),
-    [today]
-  );
-
   return (
     <main className="min-h-screen px-8 py-10">
       <div className="mx-auto w-full max-w-[58rem]">
-        <header className="flex items-center justify-between gap-6 pb-6">
-          <div className="flex items-center gap-3">
-            <img src="/images/tiger-logo.png" alt="" className="h-9 w-9" />
-            <h1 className="text-[0.9375rem] font-semibold tracking-tight text-[var(--color-ink)]">
-              Habit Tracker
-            </h1>
-          </div>
-          <p className="text-[0.8125rem] tabular-nums text-[var(--color-ink-muted)]">
-            {dateLine}
-          </p>
+        <header className="flex items-center gap-3 pb-6">
+          <img src="/images/tiger-logo.png" alt="" className="h-9 w-9" />
+          <h1 className="text-[0.9375rem] font-semibold tracking-tight text-[var(--color-ink)]">
+            Habit Tracker
+          </h1>
         </header>
 
         {notice && (
@@ -263,7 +252,7 @@ export default function DashboardPage() {
                   <div className="h-8 w-12 rounded bg-[var(--color-rule)]" />
                 </div>
                 <div>
-                  <div className="h-11 w-[152px] rounded-[var(--radius)] bg-[var(--color-rule)]" />
+                  <div className="h-11 w-[156px] rounded-[14px] bg-[var(--color-rule)]" />
                 </div>
                 <div className="h-9 w-9 rounded-full bg-[var(--color-rule)]" />
               </li>
@@ -272,37 +261,58 @@ export default function DashboardPage() {
         )}
 
         <form onSubmit={handleAddHabit} className="add-card">
-          <div className="add-row">
+          <div className="add-field-wrap">
             <label htmlFor="new-habit" className="sr-only">
               New habit name
             </label>
+            <svg
+              className="add-field-icon"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path
+                d="M12 5v14M5 12h14"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+              />
+            </svg>
             <input
               id="new-habit"
               value={newHabitName}
               onChange={(e) => setNewHabitName(e.target.value)}
-              placeholder="New habit name"
-              className="field"
+              placeholder="Add a new habit, e.g. Read 20 pages"
+              className="field add-field"
               maxLength={80}
             />
-            <button type="submit" className="btn-add" disabled={adding}>
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                aria-hidden="true"
-                focusable="false"
-              >
-                <path
-                  d="M12 5v14M5 12h14"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2.4"
-                  strokeLinecap="round"
-                />
-              </svg>
-              {adding ? "Adding" : "Add habit"}
-            </button>
           </div>
+
+          <button
+            type="submit"
+            className="btn-add add-button"
+            disabled={adding || newHabitName.trim() === ""}
+          >
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+              focusable="false"
+            >
+              <path
+                d="M12 5v14M5 12h14"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2.4"
+                strokeLinecap="round"
+              />
+            </svg>
+            {adding ? "Adding" : "Add habit"}
+          </button>
         </form>
 
         {status === "ready" && habits.length === 0 && (

@@ -8,6 +8,9 @@ DEMO_USERS = [
     {"name": "John Doe", "email": "john@example.com"},
 ]
 
+# How much history each seeded habit carries.
+DAYS_BACK = 30
+
 HABITS_BY_USER = {
     "John Doe": ["Morning run", "Read 20 pages", "Meditate", "Drink water", "Yoga"],
 }
@@ -65,12 +68,19 @@ def run_seed():
         for user in users:
             for habit_name in HABITS_BY_USER[user.name]:
                 habit = models.Habit(
-                    user_id=user.id, name=habit_name, current_streak=0, longest_streak=0
+                    user_id=user.id,
+                    name=habit_name,
+                    current_streak=0,
+                    longest_streak=0,
+                    # The habit is older than the history it carries. Without
+                    # this the creation date lands inside the check-in window
+                    # and the strip hides real days as if they never happened.
+                    created_at=datetime.utcnow() - timedelta(days=DAYS_BACK + 1),
                 )
                 db.add(habit)
                 db.commit()
                 db.refresh(habit)
-                _seed_checkins(db, habit, days_back=30)
+                _seed_checkins(db, habit, days_back=DAYS_BACK)
                 db.refresh(habit)
                 habit.longest_streak = _longest_streak_from_checkins(db, habit)
                 db.add(habit)

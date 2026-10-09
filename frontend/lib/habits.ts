@@ -76,11 +76,3 @@ export function currentWeek(today: Date): WeekDay[] {
 export function isFuture(key: string, todayKey: string): boolean {
   return key > todayKey;
 }
-
-export function formatLongDate(date: Date): string {
-  return date.toLocaleDateString("en-GB", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-  });
-}

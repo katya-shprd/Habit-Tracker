@@ -52,14 +52,19 @@ const centreX = (i: number) => TRACK_X + i * PITCH;
 type Props = {
   checked: Set<string>;
   today: Date;
+  /** The day this habit began. Days before it are not misses, they never were. */
+  startsOn: string;
   /** Day key to play the worked-node entrance on, after a check-in. */
   animateDay: string | null;
 };
 
-export default function WeekStrip({ checked, today, animateDay }: Props) {
+export default function WeekStrip({ checked, today, startsOn, animateDay }: Props) {
   const days = currentWeek(today);
   const todayKey = dayKey(today);
   const todayIndex = days.findIndex((d) => d.key === todayKey);
+  // A habit created this week starts partway through it. -1 when it is older
+  // than this week, so every day in the week counts.
+  const startIndex = days.findIndex((d) => d.key === startsOn);
   const justWorked = animateDay !== null;
   const clipId = `rail-${useId().replace(/[^a-zA-Z0-9]/g, "")}`;
 
@@ -76,14 +81,16 @@ export default function WeekStrip({ checked, today, animateDay }: Props) {
   // The tick is dark on every filled node, on green and on orange alike.
   const tickInk = "var(--color-ink-strong)";
 
-  // The rail is one length from Monday to today. It does not stop at a break,
-  // because the nodes already say which days were worked. It stops at today,
-  // because the days still to come are not part of this week yet.
-  const bedW = todayIndex < 0 ? 0 : centreX(todayIndex) - TRACK_X;
+  // The rail is one length from the habit's first day to today. It does not stop
+  // at a break, because the nodes already say which days were worked. It never
+  // starts before the habit existed, and it stops at today, because the days
+  // still to come are not part of this week yet.
+  const railStart = Math.max(0, startIndex);
+  const bedW = todayIndex < railStart ? 0 : centreX(todayIndex) - centreX(railStart);
 
   return (
     <div
-      className={`strip${doneToday ? " strip-done" : ""}`}
+      className={`strip zone-week${doneToday ? " strip-done" : ""}`}
       style={{ width: BOX_W, height: STRIP_H }}
     >
       {/* Today is lit from behind, so the eye finds it at a glance. The fill
@@ -139,7 +146,7 @@ export default function WeekStrip({ checked, today, animateDay }: Props) {
           <rect
             className={justWorked ? "rail-fill" : undefined}
             style={{ "--rail-fill": `${bedW}px` } as React.CSSProperties}
-            x={TRACK_X}
+            x={centreX(railStart)}
             y={TRACK_Y}
             width={bedW}
             height={TRACK_H}
@@ -154,7 +161,11 @@ export default function WeekStrip({ checked, today, animateDay }: Props) {
           const isToday = day.key === todayKey;
           const ahead = isFuture(day.key, todayKey);
           const isDone = checked.has(day.key);
-          const isMissed = !isDone && !isToday && !ahead;
+          // The habit did not exist yet on this day, so there is nothing to
+          // have missed. It reads the same as a day still to come. A real
+          // check-in always wins, so history is never hidden.
+          const beforeStart = startIndex >= 0 && i < startIndex && !isDone;
+          const isMissed = !isDone && !isToday && !ahead && !beforeStart;
           const pop = day.key === animateDay;
           // Once today is done the past settles, so green stays on today alone.
           const doneFill =
@@ -173,7 +184,7 @@ export default function WeekStrip({ checked, today, animateDay }: Props) {
                 r={NODE / 2 - 1}
                 fill="var(--color-leaf)"
                 stroke={
-                  ahead
+                  ahead || beforeStart
                     ? "var(--color-ahead)"
                     : isMissed
                       ? "var(--color-rule)"
