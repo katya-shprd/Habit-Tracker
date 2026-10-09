@@ -1,0 +1,175 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-07T14:05:00Z",
+  "title": "Design System: Habit Tracker",
+  "extensions": {
+    "colorMeta": {
+      "thread": {
+        "role": "primary",
+        "displayName": "Tiger Thread",
+        "canonical": "#ff9327",
+        "tonalRamp": ["#4a2000", "#6b3100", "#8b3a0e", "#c2560f", "#e07a18", "#ff9327", "#ffb163", "#ffcf9c"]
+      },
+      "thread-dark": {
+        "role": "primary",
+        "displayName": "Deep Thread",
+        "canonical": "#8b3a0e",
+        "tonalRamp": ["#2a1204", "#4a2000", "#6b3100", "#8b3a0e", "#ab5418", "#c2560f", "#d97a3a", "#eb9e6d"]
+      },
+      "linen": {
+        "role": "neutral",
+        "displayName": "Linen",
+        "canonical": "#f6ece2",
+        "tonalRamp": ["#2a231c", "#463a2e", "#63523f", "#8a7360", "#b39a86", "#d9c6b4", "#f6ece2", "#fdf9f5"]
+      },
+      "leaf": {
+        "role": "neutral",
+        "displayName": "Paper Leaf",
+        "canonical": "#fbf6ef",
+        "tonalRamp": ["#2c2620", "#4a4137", "#695c4f", "#8f8073", "#b6a89a", "#ddd1c4", "#fbf6ef", "#fffdfa"]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Brown Ink",
+        "canonical": "#5a4632",
+        "tonalRamp": ["#1c150e", "#2f2418", "#5a4632", "#7a6249", "#9c7c55", "#c2a488", "#d6c1a5", "#e8dccd"]
+      },
+      "ink-strong": {
+        "role": "neutral",
+        "displayName": "Deep Ink",
+        "canonical": "#3f3020",
+        "tonalRamp": ["#120c06", "#3f3020", "#5a4632", "#7a6249", "#9c7c55", "#bda88c", "#d6c1a5", "#e8dccd"]
+      },
+      "ink-muted": {
+        "role": "neutral",
+        "displayName": "Faded Ink",
+        "canonical": "#7a6249",
+        "tonalRamp": ["#1c150e", "#3f3020", "#5a4632", "#7a6249", "#9c7c55", "#bda88c", "#d9c8b4", "#ece2d6"]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Sampler Rule",
+        "canonical": "#d6c1a5",
+        "tonalRamp": ["#2a231c", "#4a4137", "#7a6249", "#9c7c55", "#bda88c", "#d6c1a5", "#e8dccd", "#f4ece3"]
+      },
+      "hole": {
+        "role": "neutral",
+        "displayName": "Needle Hole",
+        "canonical": "#9c7c55",
+        "tonalRamp": ["#1c150e", "#3f3020", "#5a4632", "#7a6249", "#9c7c55", "#bda88c", "#d9c8b4", "#ece2d6"]
+      }
+    },
+    "typographyMeta": {
+      "data": { "displayName": "Ledger Figure", "purpose": "Current streak figure. Largest size on the row, tabular." },
+      "title": { "displayName": "Habit Name", "purpose": "Habit names and the product name in the top bar." },
+      "body": { "displayName": "State Prose", "purpose": "Empty-state and error-state explanation, 65-75ch." },
+      "label": { "displayName": "Ledger Label", "purpose": "Best streak, weekday initials, streak unit, Remove." }
+    },
+    "shadows": [
+      {
+        "name": "leaf",
+        "value": "0 1px 1px rgba(90, 70, 50, 0.05), 0 10px 22px -14px rgba(90, 70, 50, 0.45)",
+        "purpose": "Every paper leaf and panel. A paper edge lifting off cloth."
+      }
+    ],
+    "motion": [
+      { "name": "ease-out-soft", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Default easing for every state transition." },
+      { "name": "state", "value": "160ms", "purpose": "Button, field, and text colour transitions." },
+      { "name": "stitch-work", "value": "260ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "The one authored moment: a worked stitch scaling in from scaleX(0.12) after a check-in." },
+      { "name": "knot-tie", "value": "240ms cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "The tied-off thread loop appearing when today is completed." }
+    ],
+    "breakpoints": [
+      { "name": "row-collapse", "value": "48rem", "purpose": "Habit row becomes three bands: name+streak, strip, actions." }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The check-in. The only saturated fill in the interface.",
+      "html": "<button class=\"ds-btn-primary\">Check in</button>",
+      "css": ".ds-btn-primary { height: 2.5rem; padding: 0 1.125rem; border: 0; border-radius: 0.625rem; background: #ff9327; color: #3f3020; font: 600 0.8125rem/1 Inter, ui-sans-serif, system-ui, sans-serif; white-space: nowrap; cursor: pointer; transition: background-color 160ms cubic-bezier(0.16,1,0.3,1), transform 160ms cubic-bezier(0.16,1,0.3,1); } .ds-btn-primary:hover { background: #8b3a0e; color: #fff5ea; } .ds-btn-primary:active { transform: translateY(1px); } .ds-btn-primary:focus-visible { outline: 2px solid #8b3a0e; outline-offset: 2px; }"
+    },
+    {
+      "name": "Primary Button, done",
+      "kind": "button",
+      "refersTo": "button-primary-done",
+      "description": "Today's check-in already recorded. The colour is removed entirely, never faded.",
+      "html": "<button class=\"ds-btn-done\" disabled>Checked in</button>",
+      "css": ".ds-btn-done { height: 2.5rem; padding: 0 1.125rem; border: 0; border-radius: 0.625rem; background: transparent; box-shadow: inset 0 0 0 1px #d6c1a5; color: #7a6249; font: 600 0.8125rem/1 Inter, ui-sans-serif, system-ui, sans-serif; white-space: nowrap; cursor: default; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary actions, so the check-in keeps the only orange.",
+      "html": "<button class=\"ds-btn-outline\">Add habit</button>",
+      "css": ".ds-btn-outline { height: 2.5rem; padding: 0 1.125rem; border: 0; border-radius: 0.625rem; background: #fbf6ef; box-shadow: inset 0 0 0 1px #9c7c55; color: #5a4632; font: 500 0.8125rem/1 Inter, ui-sans-serif, system-ui, sans-serif; white-space: nowrap; cursor: pointer; transition: box-shadow 160ms cubic-bezier(0.16,1,0.3,1), background-color 160ms cubic-bezier(0.16,1,0.3,1); } .ds-btn-outline:hover { box-shadow: inset 0 0 0 1px #7a6249; } .ds-btn-outline:focus-visible { outline: 2px solid #8b3a0e; outline-offset: 2px; }"
+    },
+    {
+      "name": "Quiet Button",
+      "kind": "button",
+      "refersTo": "button-quiet",
+      "description": "Destructive text actions only.",
+      "html": "<button class=\"ds-btn-quiet\">Remove</button>",
+      "css": ".ds-btn-quiet { padding: 0; border: 0; background: transparent; color: #7a6249; font: 500 0.6875rem/1.25 Inter, ui-sans-serif, system-ui, sans-serif; cursor: pointer; transition: color 160ms cubic-bezier(0.16,1,0.3,1); } .ds-btn-quiet:hover { color: #8b3a0e; } .ds-btn-quiet:focus-visible { outline: 2px solid #8b3a0e; outline-offset: 2px; }"
+    },
+    {
+      "name": "Text Field",
+      "kind": "input",
+      "refersTo": "field",
+      "description": "New habit name. Inset stroke, not a border; focus deepens the inset.",
+      "html": "<input class=\"ds-field\" placeholder=\"New habit name\" />",
+      "css": ".ds-field { width: 100%; height: 2.5rem; padding: 0 0.875rem; border: 0; border-radius: 0.625rem; background: #fbf6ef; box-shadow: inset 0 0 0 1px #d6c1a5; color: #5a4632; font: 400 0.875rem/1 Inter, ui-sans-serif, system-ui, sans-serif; caret-color: #3f3020; transition: box-shadow 160ms cubic-bezier(0.16,1,0.3,1); } .ds-field::placeholder { color: #7a6249; opacity: 1; } .ds-field:hover { box-shadow: inset 0 0 0 1px #9c7c55; } .ds-field:focus { outline: none; box-shadow: inset 0 0 0 1px #8b3a0e; }"
+    },
+    {
+      "name": "Habit Row",
+      "kind": "card",
+      "refersTo": "card-leaf",
+      "description": "One habit as a paper leaf: name, week strip, streak figure, actions.",
+      "html": "<div class=\"ds-leaf\"><div class=\"ds-name\">Morning run<span>best 9</span></div><div class=\"ds-figure\"><b>1</b><i>day</i></div></div>",
+      "css": ".ds-leaf { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 1.125rem 2.5rem; padding: 1.375rem 1.5rem; border-radius: 0.625rem; background: #fbf6ef; box-shadow: 0 1px 1px rgba(90,70,50,0.05), 0 10px 22px -14px rgba(90,70,50,0.45); color: #5a4632; font: 400 0.875rem/1.25 Inter, ui-sans-serif, system-ui, sans-serif; } .ds-name { font-weight: 600; font-size: 0.9375rem; } .ds-name span { display: block; margin-top: 0.25rem; font-weight: 400; font-size: 0.6875rem; color: #7a6249; } .ds-figure { display: flex; align-items: baseline; justify-content: flex-end; gap: 0.375rem; } .ds-figure b { font-size: 1.75rem; font-weight: 600; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; } .ds-figure i { font-style: normal; font-size: 0.6875rem; color: #7a6249; }"
+    },
+    {
+      "name": "Week Strip",
+      "kind": "custom",
+      "refersTo": "week-strip",
+      "description": "The signature component: seven days worked as one line of stitches on a printed rule.",
+      "html": "<svg class=\"ds-strip\" width=\"180\" height=\"30\" viewBox=\"0 0 180 30\"><line x1=\"0\" y1=\"15\" x2=\"162\" y2=\"15\" stroke=\"#d6c1a5\" stroke-width=\"1\"/><rect x=\"0\" y=\"0\" width=\"10\" height=\"30\" rx=\"5\" fill=\"#ff9327\"/><rect x=\"24\" y=\"0\" width=\"10\" height=\"30\" rx=\"5\" fill=\"#ff9327\"/><circle cx=\"57\" cy=\"7\" r=\"1.4\" fill=\"#9c7c55\"/><circle cx=\"57\" cy=\"23\" r=\"1.4\" fill=\"#9c7c55\"/><rect x=\"96\" y=\"0.75\" width=\"10\" height=\"28.5\" rx=\"5\" fill=\"none\" stroke=\"#ff9327\" stroke-width=\"1.5\" stroke-dasharray=\"3.5 3\"/><path d=\"M 58 15 Q 72 -1 86 15\" fill=\"none\" stroke=\"#ff9327\" stroke-width=\"1.5\" stroke-linecap=\"round\"/></svg>",
+      "css": ".ds-strip { display: block; overflow: visible; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Stitched Sampler",
+    "overview": "A habit tracker is usually drawn as a row of seven identical boxes with a tick in five of them. That layout says \"form\", and it makes the streak a number you have to trust rather than a thing you can see. This system draws the week as one continuous worked line: each day is a single stitch, a miss is bare canvas with the needle's holes left in it, and one orange thread runs along a printed rule to show exactly where the chain stands and what is still owed.\n\nThe material is deliberately plain. Cream linen ground, warm paper leaves, one orange thread, brown ink for type. Nothing is textured, glossy, or shaded for effect: the whole system is flat fills and one soft warm shadow, because the world is cloth and thread, not glass and chrome. Density is ledger-tight and everything sits on one ruled baseline, so a person who checks in several times a day reads this in seconds and never hunts.",
+    "keyCharacteristics": [
+      "Day state is carried by mark form and fill level, never by hue alone.",
+      "The saturated orange appears only where something can be pressed, or where today is at stake.",
+      "Numerals are tabular and pulled against a hard right rail, so figures align down a column.",
+      "Flat, unmodulated fills. No gradients, no gloss, no decorative motion.",
+      "One authored moment: the stitch being worked and the thread being tied off."
+    ],
+    "rules": [
+      { "name": "The One Thread Rule", "body": "The saturated orange appears on a screen only where a person can act (right now: the primary button) or where today is at stake (the waiting ring, the working stitch). Adding orange anywhere else spends the only loud colour the product has.", "section": "colors" },
+      { "name": "The Form-Not-Hue Rule", "body": "No state in this system is distinguishable only by colour. A worked day, a missed day, and an owed day differ in shape and fill level as well as hue, so the strip still reads in greyscale and to a colourblind reader.", "section": "colors" },
+      { "name": "The Hard Right Rail Rule", "body": "Figures that a person compares across rows align to the right edge. No centred numerals, no proportional figures inside a data column.", "section": "typography" },
+      { "name": "The No-Offset-Shadow Rule", "body": "Shadows carry a real offset and a real blur. A hard 4px 4px 0 block is a costume and does not appear in this system.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do let a missed day read as an absence. The gap is the message; do not fill it with a grey chip.",
+      "Do give every state a distinct shape as well as a distinct colour.",
+      "Do keep the strip's geometry in fixed pixels (PITCH, CELL_W, STITCH_W) and derive the thread path from those constants, so the thread cannot drift from the cells.",
+      "Do put the thread behind or above the stitches, never beside them."
+    ],
+    "donts": [
+      "Don't add a second saturated colour. The screen has one thread.",
+      "Don't add gradients, gloss, glass, or blur-as-decoration. The cloth is flat.",
+      "Don't put a label above a heading, or an eyebrow over the top bar.",
+      "Don't draw the row divider as a line. The gap between leaves is the divider.",
+      "Don't use a progress ring, a sparkline, or seven identical grey boxes as the week view.",
+      "Don't disable the check-in with a pale orange fill. Disabled means the colour is gone.",
+      "Don't let the thread span more than one stitch. A long arc stops reading as thread."
+    ]
+  }
+}

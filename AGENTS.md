@@ -29,3 +29,25 @@ Seed data is idempotent, it skips itself if the `users` table isn't empty.
 - Re-run the seed script: `docker compose exec backend python -m app.seed`.
 - Force a full reset first if you want fresh data: `docker compose exec postgres psql -U habit -d habit_tracker -c "TRUNCATE checkins, habits, users RESTART IDENTITY CASCADE;"`, then re-run the seed command above.
 - Or just `docker compose down -v && docker compose up`, which wipes the volume and reseeds automatically.
+
+### ASD-STE100 (Simplified Technical English)
+
+Default to ASD-STE100 for human-readable text.
+
+* Sentences: Keep short with one idea each. Avoid nested clauses.
+* Grammar: Use active voice and present tense.
+* Vocabulary: Use simple words. Avoid idioms, slang, and filler (*leverage*, *utilize*, *note that*).
+* Consistency: Stick to one term per technical concept.
+
+## Frontend conventions
+- Use Tailwind and the brand colors/fonts from `frontend/tailwind.config.ts`. Don't hardcode hex values.
+- Use shadcn components where possible.
+- The main UI is in `frontend/app/page.tsx`.
+- Always handle empty, loading, and error states.
+
+## How to work
+- Keep changes small and focused. One step at a time.
+- Before changing anything non-trivial, tell me which files you'll touch.
+- Explain what you changed in plain language after each step.
+- Don't add new dependencies without asking.
+- Any DB change needs an Alembic migration.
