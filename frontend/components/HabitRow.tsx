@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import ConfirmDialog from "./ConfirmDialog";
 import WeekStrip from "./WeekStrip";
 import {
   checkedDays,
@@ -94,6 +95,7 @@ export default function HabitRow({
       : "");
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const dotsRef = useRef<HTMLButtonElement | null>(null);
 
@@ -209,7 +211,7 @@ export default function HabitRow({
               className="menu-item menu-item-danger"
               onClick={() => {
                 setMenuOpen(false);
-                onRemove(habit.id);
+                setConfirmOpen(true);
               }}
             >
               Remove habit
@@ -217,6 +219,18 @@ export default function HabitRow({
           </div>
         )}
       </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title={`Remove ${habit.name}?`}
+        body={`This removes the habit and all of its check-ins. The card and every day it holds will be gone. You cannot undo this.`}
+        confirmLabel="Remove habit"
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={() => {
+          setConfirmOpen(false);
+          onRemove(habit.id);
+        }}
+      />
 
       <p className="sr-only">{summary}</p>
     </li>

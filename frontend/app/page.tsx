@@ -271,13 +271,47 @@ export default function DashboardPage() {
           </ul>
         )}
 
+        <form onSubmit={handleAddHabit} className="add-card">
+          <div className="add-row">
+            <label htmlFor="new-habit" className="sr-only">
+              New habit name
+            </label>
+            <input
+              id="new-habit"
+              value={newHabitName}
+              onChange={(e) => setNewHabitName(e.target.value)}
+              placeholder="New habit name"
+              className="field"
+              maxLength={80}
+            />
+            <button type="submit" className="btn-add" disabled={adding}>
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  d="M12 5v14M5 12h14"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.4"
+                  strokeLinecap="round"
+                />
+              </svg>
+              {adding ? "Adding" : "Add habit"}
+            </button>
+          </div>
+        </form>
+
         {status === "ready" && habits.length === 0 && (
           <section className="panel">
             <h2 className="text-[0.9375rem] font-semibold text-[var(--color-ink)]">
               No habits yet
             </h2>
             <p className="mt-1.5 max-w-prose text-[0.8125rem] leading-relaxed text-[var(--color-ink-muted)]">
-              Add one below. A name is all it needs. Each day you check in, the
+              Add one above. A name is all it needs. Each day you check in, the
               week rail fills another day of thread.
             </p>
           </section>
@@ -299,23 +333,6 @@ export default function DashboardPage() {
             ))}
           </ul>
         )}
-
-        <form onSubmit={handleAddHabit} className="add-form">
-          <label htmlFor="new-habit" className="sr-only">
-            New habit name
-          </label>
-          <input
-            id="new-habit"
-            value={newHabitName}
-            onChange={(e) => setNewHabitName(e.target.value)}
-            placeholder="New habit name"
-            className="field"
-            maxLength={80}
-          />
-          <button type="submit" className="btn-outline" disabled={adding}>
-            {adding ? "Adding" : "Add habit"}
-          </button>
-        </form>
       </div>
     </main>
   );
