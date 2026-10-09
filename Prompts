@@ -1,0 +1,88 @@
+Redesign the habit card component to look polished and production-ready. Keep the existing warm cream/orange visual language, but fix the issues below. Don't change data models or business logic, only the UI and its states.
+
+## Layout (desktop ≥ 720px)
+Single rounded card (radius 20px, 1px border in a slightly darker cream, soft shadow, padding 20–24px) with a 3-zone CSS grid, vertically centered:
+1. LEFT: habit name (18px, semibold) and under it a small muted line with a trophy icon: "Best: 9 days".
+2. CENTER: a week strip of 7 columns (Mon–Sun). Each column has the weekday label (12px, uppercase-ish, muted), then a 32px circle, then the date number (12px, muted) below. Show date numbers for every day.
+3. RIGHT: a streak block with a flame icon, the current streak number (32px bold, tabular-nums) and the label "day streak" / "days streak" (pluralize correctly). Next to it, the check-in button and a "⋯" icon button (overflow menu).
+
+On mobile (<720px): stack into rows: (1) name + best streak on the left and the ⋯ menu on the right, (2) the week strip full width with columns evenly distributed, (3) streak block on the left and the check-in button on the right. Everything must have min 44×44px touch targets.
+
+## Day states (use the same 32px circle for all days)
+- Done: solid orange fill, dark check icon.
+- Missed (past, not completed): empty circle with a thin muted outline and a small "×" or dot in muted color. It must NOT look tappable or like a pending day.
+- Today, not yet checked: orange outlined circle (2px) with a subtle pulse-free glow; the whole column is wrapped in a soft rounded highlight pill.
+- Today, checked: solid orange circle with check, inside the highlight pill.
+- Future: faint empty circle, muted text, reduced opacity, not interactive.
+Don't rely on color alone: use distinct icons/shapes and aria-labels such as "Monday, completed", "Tuesday, missed", "Friday, today, completed".
+
+## Streak connector
+Draw a connecting bar between day circles ONLY when two consecutive days are both completed. Never draw it across a missed day. The bar should be 6px tall, rounded, same orange at ~40% opacity, sitting behind the circles.
+
+## Check-in button
+- Not checked in today: filled primary orange button, label "Check in", with a hover darken and a pressed scale of 0.98.
+- Checked in today: soft tinted (not filled) success-style button with a check icon and the label "Checked in". On hover/focus it changes to "Undo".
+- Show a loading state while the request is in flight and disable double-clicks.
+
+## Overflow menu
+Replace the "Remove" text link with a "⋯" button opening a small menu containing "Edit" (if it exists) and "Delete habit" (red text). Deleting requires a confirm dialog or an undo toast (5 seconds). Fix any typos (e.g. "habbit" → "habit").
+
+## Design tokens (adjust slightly if they clash with the existing theme)
+--bg-page: #F6EEE3
+--bg-card: #FBF7F0
+--border: #EADFCF
+--text-primary: #4A3B2A
+--text-muted: #8A7A67   (must keep ≥ 4.5:1 contrast on the card; darken if not)
+--accent: #F29A4A
+--accent-strong: #E07F2A
+--accent-soft: #FCE3CB
+--danger: #C0392B
+Font: keep the existing sans-serif; use weights 400/500/600 only; tabular numerals for numbers.
+
+## Motion
+- Checking in: circle fills with a 200ms scale-and-fade, the check icon draws in, the streak number counts up with a short tick animation, and the connector bar grows in from the left.
+- Respect prefers-reduced-motion: disable all of the above and use instant state changes.
+
+## Accessibility and quality
+- Fully keyboard operable with visible focus rings (2px accent outline, 2px offset).
+- Semantic buttons, aria-live="polite" on the streak value, aria-labels on icon-only buttons.
+- No horizontal overflow at 320px width.
+- Support dark mode if the app already has it.
+
+## Deliverable
+Update the existing component and styles, keep props/API unchanged, and show me the before/after at desktop and mobile widths. If any requirement conflicts with the existing code, tell me instead of silently skipping it.
+
+Redesign the "Add habit" area. Replace the current Add card with a lightweight inline row (no card container, no shadow). Match the attached design reference ("Add habit" artboard).
+
+## Layout (desktop ≥ 720px)
+- Row width = same as the habit cards. Right padding = 92px, so the row ends exactly where the Check in button column ends (44px card padding + 44px menu button + 4px gap).
+- Left edge of the input = left edge of the habit cards (not indented to the titles).
+- Do not use a separate flex layout with magic widths. Share the same CSS variables or constants as the habit card for these dimensions: --card-pad-right (44px), --menu-w (44px), --menu-gap (4px), --action-w (156px), --col-gap (20px).
+- Verify: at desktop widths the Add button's left and right edges must be exactly the same x position as the Check in buttons below.
+
+## Empty state
+- Input: height 44px, radius 14px, 1.5px dashed border #CDBEA8, transparent background.
+- Plus icon (18px, muted #766654) inside the input at the left, 16px padding, 10px gap to the text.
+- Placeholder: "Add a new habit, e.g. Read 20 pages", muted #766654 (≥4.5:1 contrast).
+- No button is visible. The input spans the full row width.
+- Hover: border becomes solid #CDBEA8 and background #FFFDF9.
+
+## Focused / typing state
+- Border becomes solid 1.5px #F29A4A, background #FFFDF9, text #4A3B2A, plus icon turns #E07F2A. Focus ring: 3px rgba(242,154,74,.22).
+- When the input has non-whitespace text, an "Add habit" button appears on the right: width 156px, height 44px, radius 14px, solid primary orange (#F29A4A, dark text #3A2208, weight 600, plus icon 18px). The input shrinks to make room (gap 20px). Animate input width and button fade-in at 200ms. Respect prefers-reduced-motion (instant).
+- Enter submits and so does the button. Trim whitespace, ignore empty. After submit, clear the input, keep focus, and scroll/highlight the new habit card briefly.
+- Escape clears and blurs the input.
+
+## Rules
+- Orange filled buttons mean "Check in" or the primary Add action only. No disabled-looking tinted button in the empty state.
+- Add a visually hidden label "New habit name" for the input; the button has an accessible name "Add habit".
+- Limit habit names to a sensible max length (e.g. 60 chars) and show an inline error "Name too long" if exceeded.
+
+## Mobile (<720px)
+- Input is full width (44px min height). When text is present, the Add button appears below it, full width, 44px tall, with 12px gap.
+
+## Also fix: week-strip connector bug
+- A connector bar must only appear between two consecutive completed days. Currently a bar is drawn from a completed day into a missed day (and into the today pill). Compute the connector per pair of neighbors: draw it only if both day N and day N+1 are completed. Never draw it next to a missed, pending, or future day.
+
+## Deliverable
+Keep props/API unchanged. Show before/after screenshots at 1440px and 390px widths, with a vertical guide line through the Check in button's left edge to confirm alignment. If any requirement conflicts with the existing code, say so rather than skipping it.
